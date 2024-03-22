@@ -14,6 +14,7 @@
 \usecolortheme{gemini}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{caption} 
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.14}
@@ -22,6 +23,7 @@
 \usepackage{multicol}
 \usepackage{physics}
 \usepackage{bm}
+\usepackage[numbers]{natbib}
 \AtBeginDocument{\RenewCommandCopy\qty\SI}
 
 % ====================
@@ -84,7 +86,7 @@
       \item Monte Carlo (MC) methods allow for precise radiation exposure estimation through accurate photon interaction simulations \cite{essmedphys2012}.
       \item This poster introduces MIDSX, an open-source MC photon transport code system optimized for x-ray transport in medical imaging.
       \item MIDSX's focused design reduces the complexity of implementation and has been validated against established
-      benchmarks, showing its diagnostic potential.
+      benchmarks.
     \end{itemize}
     \vspace{-\baselineskip}
   \end{block}
@@ -158,38 +160,47 @@
       \textbf{Common Variables}
     \end{center}
 
-    \begin{multicols}{2}
+  \begin{multicols}{2}
       \begin{center}
-        $E$ - Energy of incoming photon\\
-        $\theta_e$ - Angle of ejected electron\\
-        \vspace{\baselineskip}
-        \textbf{1. Photoelectric Effect}
-      \begin{itemize}
-        \item Photon interacts with electron of target atom, resulting in an electron being ejected with $E_e = E - U_i$ and the photon being absorbed.
-      \end{itemize}
+          \begin{tabular}{@{\extracolsep{\fill}}l}
+            $E$ - Energy of incoming photon\\
+            $\theta_e$ - Angle of ejected electron\\
+          \end{tabular}
+          \vspace{\baselineskip} \\
+          \textbf{1. Photoelectric Effect}
+          \begin{itemize}
+              \item Photon interacts with electron of target atom, resulting in an electron being ejected with $E_e = E - U_i$ and the photon being absorbed.
+          \end{itemize}
       \end{center}
+      % Adjust space manually to position the image and caption at the bottom
       \vfill
-      \begin{figure}
-        \includegraphics[width = 0.4\colwidth]{photoelectric_diagram.pdf}
-        \caption{A diagram representing the photoelectric effect.}
-      \end{figure}
+      % \vspace{-\baselineskip}
+      \begin{center}
+          \includegraphics[width=0.8\linewidth]{photoelectric_diagram.pdf} % Adjust the size as needed
+          \captionof{figure}{A diagram representing the photoelectric effect.}
+      \end{center}
+      \vspace{-0.25\baselineskip}
+  
       \columnbreak%
+  
       \begin{center}
-        $\theta$ - Angle of scattered photon \\
-        $U_i$ - Binding energy of subshell\\
-        \vspace{\baselineskip}
-        \textbf{2. Compton Scattering}
-      \begin{itemize}
-        \item Photon interacts with electron of target atom, resulting in a scattered photon of energy $E'$ and a released electron with energy $E_e = E - E' - U_i$.
-      \end{itemize}
+          \begin{tabular}{@{\extracolsep{\fill}}l}
+            $\theta$ - Angle of scattered photon \\
+            $U_i$ - Binding energy of subshell\\
+          \end{tabular}
+          \vspace{\baselineskip} \\
+          \textbf{2. Compton Scattering}
+          \begin{itemize}
+              \item Photon interacts with electron of target atom, resulting in a scattered photon of energy $E'$ and a released electron with energy $E_e = E - E' - U_i$.
+          \end{itemize}
       \end{center}
-      \vfill
-      \begin{figure}
-        \includegraphics[width = 0.4\colwidth]{compton_diagram.pdf}
-        \caption{A diagram representing Rayleigh scattering.}
-      \end{figure}
-
-    \end{multicols}
+      % Manually adjust the space again for the second column
+      \vfill % This will push the image to the bottom of the column
+      \begin{center}
+          \includegraphics[width=0.8\linewidth]{compton_diagram.pdf} % Adjust the size as needed
+          \captionof{figure}{A diagram representing Rayleigh scattering.}
+      \end{center}
+  \end{multicols}
 
     \begin{center}
       \textbf{3. Rayleigh Scattering}
@@ -213,7 +224,7 @@
 
   \begin{block}{Validation}
 
-    To validate the accuracy of MIDSX, simulations were performed and compared to reference data (PENELOPE, EGSrnc, Geant4, and MCNP) obtained by the American Association of Physicists in Medicine Task Group Report 195 (TG-195) \cite{sechopoulos_monte_2015}.
+    To validate the accuracy of MIDSX, simulations were performed and compared to reference data (PENELOPE, EGSrnc, Geant4, and MCNP) obtained by the American Association of Physicists in Medicine Task Group Report 195 (TG-195) \cite{sechopoulos_monte_2015}. Validation was performed for Cases 1, 2, and 5, as described by TG-195.
 
     \begin{figure}
       \centering
@@ -263,7 +274,7 @@
   \begin{block}{References}
 
     % \nocite{*}
-    \footnotesize{\bibliographystyle{unsrt}\bibliography{poster}}
+    \footnotesize{\bibliographystyle{unsrtnat}\bibliography{poster}}
 
   \end{block}
 
