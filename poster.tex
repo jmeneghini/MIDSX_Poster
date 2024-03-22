@@ -15,7 +15,6 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{tikz}
-\usepackage{svg}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.14}
 \usepackage{anyfontsize}
@@ -52,10 +51,10 @@
 % Footer (optional)
 % ====================
 
-\footercontent{
-  \href{https://www.example.com}{https://www.example.com} \hfill
-  ABC Conference 2025, New York --- XYZ-1234 \hfill
-  \href{mailto:alyssa.p.hacker@example.com}{alyssa.p.hacker@example.com}}
+% \footercontent{
+%   \href{https://www.example.com}{https://www.example.com} \hfill
+%   ABC Conference 2025, New York --- XYZ-1234 \hfill
+%   \href{mailto:alyssa.p.hacker@example.com}{alyssa.p.hacker@example.com}}
 % (can be left out to remove footer)
 
 % ====================
@@ -81,35 +80,33 @@
   \begin{block}{Introduction}
     \begin{itemize}
       \item Computed Tomography (CT) imaging is crucial in medical diagnostics but involves risks from ionizing radiation.
-      \item Monitoring of radiation exposure is essential, measured in absorbed dose and air kerma.
-      \item Monte Carlo (MC) methods allow for precise radiation exposure estimation through accurate photon interaction simulations.
+      \item Monitoring of radiation exposure is essential, measured in absorbed dose and air kerma \cite{lauer2009elements}.
+      \item Monte Carlo (MC) methods allow for precise radiation exposure estimation through accurate photon interaction simulations \cite{essmedphys2012}.
       \item This poster introduces MIDSX, an open-source MC photon transport code system optimized for x-ray transport in medical imaging.
       \item MIDSX's focused design reduces the complexity of implementation and has been validated against established
       benchmarks, showing its diagnostic potential.
     \end{itemize}
-  
+    \vspace{-\baselineskip}
   \end{block}
 
   \begin{block}{Simulation Geometry}
     The geometry of a transport simulation consists of the following objects:
     \begin{itemize}
       \item A source object to specify the generation of photons.
-      \item Voxel grid(s), stored via NifTI files, to contain object/body geometries and material information.
+      \item Voxel grid(s), stored via NifTI files \cite{nifti2004}, to contain object/body geometries and material information.
       \item Tally(s) to track trajectories of photons, incident energy, deposited energy, and other quantities of interest.
       \item A computational domain to contain these objects and to specify a background material.
     \end{itemize}
 
     \begin{figure}
       \centering
-      \includegraphics[width = \colwidth]{comp_domain.pdf}
+      \includegraphics[width = 0.7\colwidth]{comp_domain.pdf}
       \caption{A typical transport geometry used in MIDSX.}
     \end{figure}
-    
-
+    \vspace{-\baselineskip}
   \end{block}
 
   \begin{block}{Transport Theory}
-
     \begin{itemize}
       \item As a photon take "steps" through a homogenous computational domain, its position after taking the $n$-th step is represented by the parametric ray equation:
     \end{itemize}
@@ -131,27 +128,32 @@
       t = -\frac{1}{n\sigma} \ln \gamma, 
     \end{equation}
     where $\gamma$ is a uniformly distributed random number in the interval $[0, 1)$.
-  \end{block}
 
+    \begin{itemize}
+      \item In order to generalize this to an inhomogeneous domain, MIDSX uses $\delta$ tracking \cite{vassiliev_monte_2017}.
+      \item This effectively changes $\sigma \rightarrow \sigma_{\rm{max}}$ in Eq.~\ref{eq:pdf} and Eq.~\ref{eq:t_inv}, where $\sigma_{\rm{max}}$ is the maximum cross-section in the domain.
+      \item In order to correct for the resulting systematic decrease in $t$, we implement $\delta$ interactions as an alternative to photon-matter interactions. The probability of which is given by 
+    \end{itemize}  
+
+  \end{block}
 \end{column}
 
 \separatorcolumn
 
 \begin{column}{\colwidth}
 
-  % continuing theory, so no new block
-  \begin{itemize}
-    \item In order to generalize this to an inhomogeneous domain, MIDSX uses $\delta$ tracking.
-    \item This effectively changes $\sigma \rightarrow \sigma_{\rm{max}}$ in Eq.~\ref{eq:pdf} and Eq.~\ref{eq:t_inv}, where $\sigma_{\rm{max}}$ is the maximum cross-section in the domain.
-    \item In order to correct for the resulting systematic decrease in $t$, we implement $\delta$ interactions as an alternative to photon-matter interactions. The probability of which is given by 
-  \end{itemize}
   \begin{equation}
     P_{\delta} = \frac{\sigma_{\text{max}}(E) - \sigma(E, M)}{\sigma_{\text{max}}(E)}.
   \end{equation}
 
+  \begin{itemize}
+    \item When a $\delta$ interaction occurs, nothing happens, and the next step is taken.
+  \end{itemize}  
+
 
   \begin{block}{Photon-Matter Interactions}
-    There are 3 fundamental possible photon-matter interactions in the medical x-ray energy range:
+    If a $\delta$ interaction does not occur, then a real interaction is sampled. There are 3 fundamental possible photon-matter (real) interactions in the medical x-ray energy range that MIDSX implements:
+    \vspace{-0.5\baselineskip}
     \begin{center}
       \textbf{Common Variables}
     \end{center}
@@ -181,6 +183,7 @@
         \item Photon interacts with electron of target atom, resulting in a scattered photon of energy $E'$ and a released electron with energy $E_e = E - E' - U_i$.
       \end{itemize}
       \end{center}
+      \vfill
       \begin{figure}
         \includegraphics[width = 0.4\colwidth]{compton_diagram.pdf}
         \caption{A diagram representing Rayleigh scattering.}
@@ -193,77 +196,31 @@
       \begin{itemize}
         \item Photon interacts coherently with atom, resulting in photon scattering with no energy loss.
       \end{itemize}
-      \vspace{-2\baselineskip}
+      \vspace{-1\baselineskip}
       \begin{figure}
         \includegraphics[width = 0.4\colwidth]{rayleigh_diagram.pdf}
         \caption{A diagram representing Compton scattering.}
       \end{figure}
     \end{center}
-
-
+    \vspace{-\baselineskip}
   \end{block}
 
-  \begin{block}{Fusce aliquam magna velit}
+  \begin{center}
+    \textbf{Implementation}
+  \end{center}
 
-    Et rutrum ex euismod vel. Pellentesque ultricies, velit in fermentum
-    vestibulum, lectus nisi pretium nibh, sit amet aliquam lectus augue vel
-    velit. Suspendisse rhoncus massa porttitor augue feugiat molestie. Sed
-    molestie ut orci nec malesuada. Sed ultricies feugiat est fringilla
-    posuere.
+  For coherent and incoherent scattering, the methodology of \cite{lund2018implementation} was adapted for use in MIDSX, neglecting Doppler energy broadening and the production of secondary particles. For the photoelectric effect, the photon is terminated and all energy is deposited at the location of interaction.
+
+  \begin{block}{Validation}
+
+    To validate the accuracy of MIDSX, simulations were performed and compared to reference data (PENELOPE, EGSrnc, Geant4, and MCNP) obtained by the American Association of Physicists in Medicine Task Group Report 195 (TG-195) \cite{sechopoulos_monte_2015}.
 
     \begin{figure}
       \centering
-      \begin{tikzpicture}
-        \begin{axis}[
-            scale only axis,
-            no markers,
-            domain=0:2*pi,
-            samples=100,
-            axis lines=center,
-            axis line style={-},
-            ticks=none]
-          \addplot[red] {sin(deg(x))};
-          \addplot[blue] {cos(deg(x))};
-        \end{axis}
-      \end{tikzpicture}
-      \caption{Another figure caption.}
+      \includegraphics[width = \colwidth]{ROI_0_deg__pencil_paper_ready_wo_mutiple.pdf}
+      \caption{The energy per initial photon (p.i.p.) (eV/photon) of photons incident upon each region of interest (ROI) for the $0^\circ$, pencil beam, 56.4 keV simulation as described by Case 2. The incident energy was determined separately for photons that underwent (a) a single incoherent scatter and (b) a single coherent scatter.}
+      \label{fig:ROIPGraph}
     \end{figure}
-
-  \end{block}
-
-  \begin{block}{Nam cursus consequat egestas}
-
-    Nulla eget sem quam. Ut aliquam volutpat nisi vestibulum convallis. Nunc a
-    lectus et eros facilisis hendrerit eu non urna. Interdum et malesuada fames
-    ac ante \textit{ipsum primis} in faucibus. Etiam sit amet velit eget sem
-    euismod tristique. Praesent enim erat, porta vel mattis sed, pharetra sed
-    ipsum. Morbi commodo condimentum massa, \textit{tempus venenatis} massa
-    hendrerit quis. Maecenas sed porta est. Praesent mollis interdum lectus,
-    sit amet sollicitudin risus tincidunt non.
-
-    Etiam sit amet tempus lorem, aliquet condimentum velit. Donec et nibh
-    consequat, sagittis ex eget, dictum orci. Etiam quis semper ante. Ut eu
-    mauris purus. Proin nec consectetur ligula. Mauris pretium molestie
-    ullamcorper. Integer nisi neque, aliquet et odio non, sagittis porta justo.
-
-    \begin{itemize}
-      \item \textbf{Sed consequat} id ante vel efficitur. Praesent congue massa
-        sed est scelerisque, elementum mollis augue iaculis.
-        \begin{itemize}
-          \item In sed est finibus, vulputate
-            nunc gravida, pulvinar lorem. In maximus nunc dolor, sed auctor eros
-            porttitor quis.
-          \item Fusce ornare dignissim nisi. Nam sit amet risus vel lacus
-            tempor tincidunt eu a arcu.
-          \item Donec rhoncus vestibulum erat, quis aliquam leo
-            gravida egestas.
-        \end{itemize}
-      \item \textbf{Sed luctus, elit sit amet} dictum maximus, diam dolor
-        faucibus purus, sed lobortis justo erat id turpis.
-      \item \textbf{Pellentesque facilisis dolor in leo} bibendum congue.
-        Maecenas congue finibus justo, vitae eleifend urna facilisis at.
-    \end{itemize}
-
   \end{block}
 
 \end{column}
@@ -272,75 +229,41 @@
 
 \begin{column}{\colwidth}
 
-  \begin{exampleblock}{A highlighted block containing some math}
-
-    A different kind of highlighted block.
-
-    $$
-    \int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}
-    $$
-
-    Interdum et malesuada fames $\{1, 4, 9, \ldots\}$ ac ante ipsum primis in
-    faucibus. Cras eleifend dolor eu nulla suscipit suscipit. Sed lobortis non
-    felis id vulputate.
-
-    \heading{A heading inside a block}
-
-    Praesent consectetur mi $x^2 + y^2$ metus, nec vestibulum justo viverra
-    nec. Proin eget nulla pretium, egestas magna aliquam, mollis neque. Vivamus
-    dictum $\mathbf{u}^\intercal\mathbf{v}$ sagittis odio, vel porta erat
-    congue sed. Maecenas ut dolor quis arcu auctor porttitor.
-
-    \heading{Another heading inside a block}
-
-    Sed augue erat, scelerisque a purus ultricies, placerat porttitor neque.
-    Donec $P(y \mid x)$ fermentum consectetur $\nabla_x P(y \mid x)$ sapien
-    sagittis egestas. Duis eget leo euismod nunc viverra imperdiet nec id
-    justo.
-
-  \end{exampleblock}
-
-  \begin{block}{Nullam vel erat at velit convallis laoreet}
-
-    Class aptent taciti sociosqu ad litora torquent per conubia nostra, per
-    inceptos himenaeos. Phasellus libero enim, gravida sed erat sit amet,
-    scelerisque congue diam. Fusce dapibus dui ut augue pulvinar iaculis.
-
-    \begin{table}
+    \begin{figure}
       \centering
-      \begin{tabular}{l r r c}
-        \toprule
-        \textbf{First column} & \textbf{Second column} & \textbf{Third column} & \textbf{Fourth} \\
-        \midrule
-        Foo & 13.37 & 384,394 & $\alpha$ \\
-        Bar & 2.17 & 1,392 & $\beta$ \\
-        Baz & 3.14 & 83,742 & $\delta$ \\
-        Qux & 7.59 & 974 & $\gamma$ \\
-        \bottomrule
-      \end{tabular}
-      \caption{A table caption.}
-    \end{table}
+    \includegraphics[width= \colwidth]{radiography_body_dep_paper_ready.pdf}
+    \caption{The energy deposited per initial photon (p.i.p.) (eV/photon) in the simulated tissue for the full-field simulation as described by Case 2. The simulation was performed at 56.4 keV and 120 kVp at both (a) $0^\circ$ and (b) $15^\circ$, with the 120 kVp spectrum provided by TG-195.}
+     \label{fig:BDGraph}
+    \end{figure}
 
-    Donec quis posuere ligula. Nunc feugiat elit a mi malesuada consequat. Sed
-    imperdiet augue ac nibh aliquet tristique. Aenean eu tortor vulputate,
-    eleifend lorem in, dictum urna. Proin auctor ante in augue tincidunt
-    tempor. Proin pellentesque vulputate odio, ac gravida nulla posuere
-    efficitur. Aenean at velit vel dolor blandit molestie. Mauris laoreet
-    commodo quam, non luctus nibh ullamcorper in. Class aptent taciti sociosqu
-    ad litora torquent per conubia nostra, per inceptos himenaeos.
+    \begin{figure}
+      \centering
+    \includegraphics[width= \colwidth]{CT_120_0_big_font.pdf}
+    \caption{The energy deposited per initial photon (p.i.p.) (eV/photon) in the material IDs/organs composing a voxelized human phantom for the $0^\circ$, 120 kVp simulation as described by Case 5.}
+    \label{fig:CTGraph}
+    \end{figure}
+  
 
-    Nulla varius finibus volutpat. Mauris molestie lorem tincidunt, iaculis
-    libero at, gravida ante. Phasellus at felis eu neque suscipit suscipit.
-    Integer ullamcorper, dui nec pretium ornare, urna dolor consequat libero,
-    in feugiat elit lorem euismod lacus. Pellentesque sit amet dolor mollis,
-    auctor urna non, tempus sem.
+  \begin{block}{Discussion}
+    \section*{Discussion Highlights}
 
+  \begin{itemize}
+      \item MIDSX demonstrates varied but reasonable agreement with TG-195 reference code systems, with excellent agreement in Case 1, validating its reliability for primary particle measurements.
+      \item Fig.~\ref{fig:ROIPGraph} shows almost universal agreement in ROIs for Case 2, except for discrepancies in incoherent scatter energy deposition in ROIs 4 and 5.
+      \item A mean-percent-error (MPE) of 13.1\% for ROI 5 points at numerical instability in the incoherent scattering algorithm, likely due to narrow-angle scatters and the scattering angle distribution at $\theta = 0^\circ$ being steep.
+      \item The $15^\circ$ full-field tissue energy deposition of Fig.~\ref{fig:BDGraph} shows an MPE of 0.6\%, indicating possible geometric errors with the source or body.
+      \item For Case 5, all organ energy depositions were lower than reference codes, except for the thyroid. The max MPE observed was 6.3\%.
+      \item Orientation verification through root-mean-square-percent-error (RMSPE) analysis suggests correct phantom orientation in CT simulations, pointing to other errors in MIDSX that require further investigation.
+      \item Future work will focus on investigating the implementation of scattering events, cross-section data initialization, and interpolation errors in MIDSX.
+      \item MIDSX source code and usage examples are available in its GitHub repository \cite{MIDSX2023}.
+  \end{itemize}
+    
   \end{block}
 
   \begin{block}{References}
 
-    \nocite{*}
-    \footnotesize{\bibliographystyle{plain}\bibliography{poster}}
+    % \nocite{*}
+    \footnotesize{\bibliographystyle{unsrt}\bibliography{poster}}
 
   \end{block}
 
