@@ -168,44 +168,47 @@
 %   \end{beamercolorbox}
 % }
 
+% Headline
 \setbeamertemplate{headline}
 {
   \begin{beamercolorbox}{headline}
     \begin{columns}
       \begin{column}{\maxlogowidth}
+        \vskip5ex
         \ifdefined\insertlogoleft
-        \vspace*{1ex} % Reduced vertical space
+        \vspace*{\fill}
         \hspace{10ex}
         \raggedright
         \insertlogoleft
-        \vspace*{1ex} % Reduced vertical space
+        \vspace*{\fill}
         \else\fi
       \end{column}
       \begin{column}{\dimexpr\paperwidth-\maxlogowidth-\maxlogowidth}
         \usebeamerfont{headline}
-        \vskip1ex % Reduced vertical skip
+        \vskip3ex
         \centering
         \ifx \inserttitle \empty \else
-        {\usebeamerfont{headline title}\usebeamercolor[fg]{headline title}\inserttitle\\[0.3ex]} % Reduced spacing
+        {\usebeamerfont{headline title}\usebeamercolor[fg]{headline title}\inserttitle\\[0.5ex]}
         \fi
         \ifx \beamer@shortauthor \empty \else
-        {\usebeamerfont{headline author}\usebeamercolor[fg]{headline author}\insertauthor\\[0.5ex]} % Reduced spacing
+        {\usebeamerfont{headline author}\usebeamercolor[fg]{headline author}\insertauthor\\[1ex]}
         \fi
         \ifx \insertinstitute \empty \else
-        {\usebeamerfont{headline institute}\usebeamercolor[fg]{headline institute}\insertinstitute\\[0.5ex]} % Reduced spacing
+        {\usebeamerfont{headline institute}\usebeamercolor[fg]{headline institute}\insertinstitute\\[1ex]}
         \fi
       \end{column}
       \begin{column}{\maxlogowidth}
+        \vskip5ex
         \ifdefined\insertlogoright
-        \vspace*{1ex} % Reduced vertical space
+        \vspace*{\fill}
         \raggedleft
         \insertlogoright
         \hspace{10ex}
-        \vspace*{1ex} % Reduced vertical space
+        \vspace*{\fill}
         \else\fi
       \end{column}
     \end{columns}
-    \vspace{1ex} % Reduced overall vertical space at the bottom
+    \vspace{5ex}
     \ifbeamercolorempty[bg]{headline rule}{}{
       \begin{beamercolorbox}[wd=\paperwidth,colsep=0.5ex]{headline rule}\end{beamercolorbox}
     }
